@@ -14,4 +14,3 @@ reportlab>=3.6.0  # Alternativa para generar PDFs sin tkcap
 
 # Optional: python-xlib (solo para Linux, descomentar si es necesario)
 # python-xlib>=0.33; sys_platform == "linux"
-# Optional: pyobjc (solo para macOS, descomentar si es necesario)
