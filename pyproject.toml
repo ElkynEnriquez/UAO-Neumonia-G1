@@ -1,7 +1,16 @@
 [project]
-name = "uao-neumonia-g1"
+name = "uao-neumonia-g2"
 version = "0.1.0"
-description = "Add your description here"
+description = "Herramienta para la detección rápida de neumonía mediante Deep Learning"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.21.0",
+    "tensorflow>=2.10.0",
+    "opencv-python>=4.5.0",
+    "pillow>=9.0.0",
+    "pydicom>=2.3.0",
+    "tkcap>=0.0.1",
+    "img2pdf>=0.4.0",
+    "reportlab>=3.6.0",
+]
