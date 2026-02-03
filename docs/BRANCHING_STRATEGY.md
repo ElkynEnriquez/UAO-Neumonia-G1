@@ -1,4 +1,100 @@
-# Estrategia de Ramas - UAO Neumonía G1
+
+# Estrategia de Ramas — Resumen claro y práctico
+
+Este documento resume el flujo de trabajo recomendado para el proyecto: ramas principales `dev`, `uat` y `main`. Está orientado a que el equipo trabaje con PRs, CI y releases controlados.
+
+## Resumen ejecutivo
+- `dev`: integración diaria y desarrollo (recibir PRs desde ramas feature).
+- `uat`: pruebas de aceptación (release candidate desde `dev`).
+- `main`: producción; siempre estable y protegida.
+
+## Flujo en una frase
+Desarrollas en `feature/*` desde `dev` → PR a `dev` → cuando hay candidate → promover a `uat` → pruebas → merge a `main` → tag y deploy.
+
+## Ciclo de una rama feature (práctico)
+1. Crear desde `dev`:
+  ```bash
+  git checkout dev
+  git pull origin dev
+  git checkout -b feature/descripcion
+  ```
+2. Desarrollar localmente, commits frecuentes.
+3. Subir para revisión:
+  ```bash
+  git push -u origin feature/descripcion
+  ```
+4. Crear PR en GitHub: `feature/descripcion` → `dev`.
+5. Tras aprobación, merge a `dev` y eliminar la rama feature (local y remoto):
+  ```bash
+  git branch -d feature/descripcion
+  git push origin --delete feature/descripcion
+  ```
+
+## Roles y responsabilidades (resumido)
+- Desarrollador: crea `feature/*`, PR hacia `dev`, arregla comentarios.
+- Revisor/QA: valida PRs, ejecuta pruebas en `dev` o `uat`.
+- Gerente de release/DevOps: promueve `dev` → `uat` → `main`, crea tags y despliega.
+
+## Reglas mínimas recomendadas
+- Usar PRs para todas las fusiones entre ramas.
+- `main` protegido: no push directo, requiere PR + 1–2 revisiones + CI verde.
+- `uat` protegido: requiere PR y checks.
+- `dev`: mínimo 1 revisión.
+
+## Convenciones de nombres (breve)
+- `feature/<desc>` — nueva funcionalidad
+- `fix/<desc>` — corrección urgente
+- `chore/<desc>` — mantenimiento/configuración
+
+Ejemplo útil para tu caso: actualizar `.gitignore` y `pyproject.toml` → `chore/configure-project-files`.
+
+## Cheat-sheet de comandos (rápido)
+```powershell
+# Ver ramas locales
+git branch
+
+# Ver ramas remotas
+git branch -r
+
+# Cambiar a rama
+git checkout dev
+
+# Crear feature desde dev
+git checkout -b feature/mi-feature
+
+# Preparar y commitear
+git add .gitignore pyproject.toml
+git commit -m "chore: actualizar .gitignore y pyproject.toml"
+
+# Subir rama por primera vez
+git push -u origin feature/mi-feature
+
+# Actualizar rama base
+git checkout dev
+git pull origin dev
+
+# Merge de release aprobado (ejemplo)
+git checkout uat
+git merge --no-ff origin/dev
+git push origin uat
+
+# Promover a main
+git checkout main
+git merge --no-ff origin/uat
+git push origin main
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+```
+
+## FAQ corto
+- ¿Se suben las ramas feature a GitHub? Sí — temporalmente para PRs y CI; se borran tras el merge.
+- ¿Dónde se despliega? Desde `main`.
+- ¿Y `dev`? Es la rama de integración; no despliegues desde `dev` en producción.
+
+---
+
+**Última actualización**: 30 de enero de 2026
+
 
 ## Resumen Ejecutivo
 Este proyecto utiliza un flujo de 3 ramas (GitFlow simplificado):
@@ -221,7 +317,166 @@ git commit -m "fix: corregir diagnóstico de neumonía en pacientes > 65 años"
 
 ---
 
+## Guía Práctica: Flujo Paso a Paso
+
+### Paso 1️⃣: Prepara tu rama base (`dev`)
+```powershell
+# Cambiar a dev
+git checkout dev
+
+# Descargar los últimos cambios del remoto
+git pull origin dev
+```
+
+### Paso 2️⃣: Crea tu rama de feature
+```powershell
+# Crear rama DESDE dev con nombre descriptivo
+# Formato: tipo/descripción-corta
+git checkout -b feature/nombre-funcionalidad
+
+# Ejemplos:
+# git checkout -b feature/agregar-login
+# git checkout -b chore/setup-project-config
+# git checkout -b fix/corregir-diagnostico
+```
+
+**Verifica que estés en la rama correcta:**
+```powershell
+git branch
+# Deberías ver:
+# * feature/nombre-funcionalidad  ← el asterisco indica tu rama actual
+#   dev
+#   main
+#   uat
+```
+
+### Paso 3️⃣: Haz cambios en tus archivos
+- Abre VS Code
+- Edita los archivos que necesites (`.gitignore`, `main.py`, `models.py`, etc.)
+- Guarda los cambios (Ctrl+S)
+
+### Paso 4️⃣: Verifica qué cambiaste
+```powershell
+git status
+```
+
+**Output esperado:**
+```
+On branch feature/nombre-funcionalidad
+Changes not staged for commit:
+  modified:   .gitignore
+  modified:   pyproject.toml
+  modified:   main.py
+
+Untracked files:
+  new_file.py
+```
+
+### Paso 5️⃣: Prepara los cambios (staging)
+```powershell
+# Opción A: agregar archivos específicos
+git add .gitignore pyproject.toml main.py
+
+# Opción B: agregar TODOS los cambios (cuidado, verifica primero)
+git add .
+```
+
+**Verifica que quedó preparado:**
+```powershell
+git status
+# Deberías ver "Changes to be committed:"
+```
+
+### Paso 6️⃣: Haz commit (registra cambios)
+```powershell
+# Formato: tipo(scope): descripción breve
+git commit -m "feat(auth): agregar autenticación JWT"
+
+# Ejemplos:
+# git commit -m "chore: configurar .gitignore y pyproject.toml"
+# git commit -m "fix(diagnostic): corregir algoritmo de detección"
+# git commit -m "docs: actualizar README con instrucciones"
+```
+
+### Paso 7️⃣: ¿Más cambios? Repite pasos 3-6
+```powershell
+# Si necesitas hacer más cambios:
+# 1. Edita más archivos
+# 2. git add archivos-nuevos
+# 3. git commit -m "otro cambio"
+# 4. Repite según sea necesario
+```
+
+**Puedes tener múltiples commits en una rama:**
+```
+commit 1: "feat(auth): agregar login"
+commit 2: "feat(auth): agregar validación"
+commit 3: "test(auth): agregar tests"
+```
+
+### Paso 8️⃣: Sube tu rama al remoto (GitHub)
+```powershell
+# Primera vez en esta rama (crea rama remota y establece seguimiento)
+git push -u origin feature/nombre-funcionalidad
+
+# Próximas veces en esta rama (solo actualiza)
+git push origin feature/nombre-funcionalidad
+```
+
+### Paso 9️⃣: Crea un Pull Request (PR) en GitHub
+1. Ve a https://github.com/ElkynEnriquez/UAO-Neumonia-G1
+2. GitHub debería mostrar un mensaje: **"Compare & pull request"**
+3. Haz clic en ese botón
+4. **Verifica:**
+   - **Base**: `dev` (NO `main`)
+   - **Compare**: `feature/nombre-funcionalidad`
+5. Agrega descripción clara de qué cambios hiciste
+6. Solicita revisores (Code Reviewers)
+7. Haz clic en **"Create Pull Request"**
+
+### Paso 🔟: Espera revisión y aprobación
+- Reviewer revisa tu código
+- Si pide cambios: haz más commits en tu rama local y haz `git push`
+- Si aprueba: alguien mergea el PR en GitHub
+
+### Paso 1️⃣1️⃣: Limpia después de mergear
+```powershell
+# Una vez que el PR esté mergeado en GitHub
+
+# Eliminar rama local
+git branch -d feature/nombre-funcionalidad
+
+# Eliminar rama remota
+git push origin --delete feature/nombre-funcionalidad
+
+# Actualizar dev con los cambios nuevos
+git checkout dev
+git pull origin dev
+```
+
+---
+
 ## Comandos Rápidos de Referencia
+
+# Ver dónde estoy ahora
+git branch        # el * muestra la rama actual
+
+# Ver todas las ramas (local + remoto)
+git branch -a
+
+# Cambiar a otra rama
+git checkout dev
+git checkout main
+
+# Crear nueva rama (desde la rama actual)
+git checkout -b feature/mi-feature
+
+# Subir cambios
+git push origin nombre-rama
+
+# Traer cambios del remoto
+git pull origin nombre-rama
+
 
 ```bash
 # Ver todas las ramas locales y remotas
@@ -269,6 +524,41 @@ R: Crea siempre una `feature/...` desde `dev`, no trabajes directamente en `dev`
 R: Cuando haces merge a `main` para una release. Tag = versión formal (v1.0.0, v1.0.1, etc.).
 
 ---
+
+## Ciclo de las ramas "feature" (local → remoto → PR → merge → eliminación)
+
+Las ramas de feature son ramas temporales que se crean localmente desde `dev` para desarrollar una tarea concreta. Es correcto y recomendado subirlas a GitHub mientras están en progreso para:
+
+- Permitir revisiones por pares (Pull Requests).
+- Ejecutar checks de CI en el remoto.
+- Compartir el trabajo con el equipo.
+
+Flujo típico:
+
+1. Crear la rama local desde `dev`:
+  ```bash
+  git checkout dev
+  git pull origin dev
+  git checkout -b feature/descripcion
+  ```
+2. Trabajar localmente, hacer commits y pruebas.
+3. Subir la rama temporal al remoto para crear PR:
+  ```bash
+  git push -u origin feature/descripcion
+  ```
+4. Crear un Pull Request en GitHub: `feature/descripcion` → `dev`. Esperar revisiones y pasar CI.
+5. Cuando el PR es aprobado, mergear en `dev` (habitualmente vía GitHub usando la opción de Merge que el equipo acuerde).
+6. Después del merge: eliminar la rama feature tanto local como remota:
+  ```bash
+  git branch -d feature/descripcion
+  git push origin --delete feature/descripcion
+  ```
+
+Notas importantes:
+- Aunque la rama exista en GitHub temporalmente, el código final queda en `dev` tras el merge.
+- Eliminar la rama feature evita acumulación de ramas y mantiene el repositorio limpio.
+- En casos excepcionales (investigación, WIP compartido) puede mantenerse más tiempo, pero documentarlo en la PR.
+
 
 ## Responsabilidades por Rol
 
