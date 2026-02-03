@@ -194,4 +194,4 @@ Este proyecto es parte del trabajo académico de la Universidad Autónoma de Occ
 ---
 
 **Versión:** 0.1.0  
-**Última actualización:** Enero 2026
+**Última actualización:** 02 febrero 2026
