@@ -128,5 +128,17 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# IDEs
+.vscode/
+
+# La biblioteca uv es un administrador de paquetes para proyectos de Python
+uv.lock
+
+# archivo main.py
+main.py
+
+# Large model files (store separately)
+data/models/*.h5
+data/models/*.keras
 # Carpeta Resportes 
 reports/

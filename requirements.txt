@@ -1,10 +1,16 @@
-pyautogui
-pillow
-tkcap
-pydicom
-img2pdf
-opencv_python
-matplotlib
-pandas
-tensorflow
-python-xlib
+# Core dependencies
+numpy>=1.21.0
+tensorflow>=2.10.0
+
+# Image processing
+opencv-python>=4.5.0
+pillow>=9.0.0
+pydicom>=2.3.0
+
+# GUI and utilities
+tkcap>=0.0.1
+img2pdf>=0.4.0
+reportlab>=3.6.0  # Alternativa para generar PDFs sin tkcap
+
+# Optional: python-xlib (solo para Linux, descomentar si es necesario)
+# python-xlib>=0.33; sys_platform == "linux"
