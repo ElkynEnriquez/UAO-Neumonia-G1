@@ -1,0 +1,11 @@
+services:
+  neumonia:
+    build: .
+    container_name: neumonia-detector
+    volumes:
+      - ./data:/data
+      - ./report:/app/report
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
