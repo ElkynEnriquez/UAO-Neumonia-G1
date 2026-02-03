@@ -142,3 +142,15 @@ data/models/*.h5
 data/models/*.keras
 # Carpeta Resportes 
 reports/
+
+# Entradas adicionales recomendadas (locales, caches y SO)
+.ruff_cache
+.ruffcache
+.ruff
+.DS_Store
+Thumbs.db
+.env.local
+.env.*
+tmp/
+temp/
+.idea/
