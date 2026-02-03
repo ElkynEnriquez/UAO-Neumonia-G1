@@ -141,7 +141,7 @@ main.py
 data/models/*.h5
 data/models/*.keras
 # Carpeta Resportes 
-reports/
+report/
 
 # Entradas adicionales recomendadas (locales, caches y SO)
 .ruff_cache
