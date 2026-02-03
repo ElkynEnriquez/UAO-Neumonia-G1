@@ -141,4 +141,4 @@ main.py
 data/models/*.h5
 data/models/*.keras
 # Carpeta Resportes 
-reports/
+report/
