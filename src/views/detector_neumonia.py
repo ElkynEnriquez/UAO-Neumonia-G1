@@ -9,21 +9,12 @@ Utiliza los módulos modulares del proyecto para realizar predicciones.
 from tkinter import *
 from tkinter import ttk, font, filedialog, Entry, END
 from tkinter.messagebox import askokcancel, showinfo, WARNING
-import csv
-import img2pdf
 from PIL import ImageTk, Image
-
-# Importar tkcap de forma opcional (puede fallar en Python 3.11+)
-try:
-    import tkcap
-    TKCAP_AVAILABLE = True
-except (ImportError, ModuleNotFoundError):
-    TKCAP_AVAILABLE = False
-    print("Advertencia: tkcap no está disponible. La función de generar PDF puede estar limitada.")
 
 # Importar módulos del proyecto
 from src.services.read_img import read_image
 from src.controllers.integrator import predict
+from src.services.report_generator import save_results_csv, generate_pdf_report
 
 
 class App:
@@ -197,16 +188,16 @@ class App:
                 )
                 return
 
-            with open("historial.csv", "a", newline='', encoding='utf-8') as csvfile:
-                w = csv.writer(csvfile, delimiter="-")
-                w.writerow(
-                    [
-                        self.text1.get() or "N/A",
-                        self.label,
-                        "{:.2f}".format(self.proba) + "%"
-                    ]
-                )
-            showinfo(title="Guardar", message="Los datos se guardaron con éxito.")
+            # Usar el servicio compartido de reportes
+            if save_results_csv(
+                patient_id=self.text1.get() or "N/A",
+                label=self.label,
+                probability=self.proba,
+                filepath="historial.csv"
+            ):
+                showinfo(title="Guardar", message="Los datos se guardaron con éxito.")
+            else:
+                showinfo(title="Error", message="No se pudieron guardar los datos.")
         except Exception as e:
             showinfo(
                 title="Error",
@@ -215,8 +206,6 @@ class App:
 
     def create_pdf(self):
         """Genera un PDF con el reporte de la predicción"""
-        import os
-        
         try:
             if self.label is None:
                 showinfo(
@@ -225,67 +214,21 @@ class App:
                 )
                 return
 
-            # Crear carpeta report si no existe
-            reportes_dir = "report"
-            if not os.path.exists(reportes_dir):
-                os.makedirs(reportes_dir)
-
-            if TKCAP_AVAILABLE:
-                # Método original usando tkcap
-                cap = tkcap.CAP(self.root)
-                ID = "Reporte" + str(self.reportID) + ".jpg"
-                img = cap.capture(ID)
-                img = Image.open(ID)
-                img = img.convert("RGB")
-                pdf_path = os.path.join(reportes_dir, f"Reporte{self.reportID}.pdf")
-                img.save(pdf_path)
+            # Usar el servicio compartido de reportes
+            success, result = generate_pdf_report(
+                patient_id=self.text1.get() or "N/A",
+                label=self.label,
+                probability=self.proba,
+                heatmap_array=self.heatmap,
+                output_dir="report",
+                report_id=self.reportID
+            )
+            
+            if success:
                 self.reportID += 1
-                showinfo(title="PDF", message=f"El PDF fue generado con éxito: {pdf_path}")
+                showinfo(title="PDF", message=f"El PDF fue generado con éxito:\n{result}")
             else:
-                # Método alternativo sin tkcap: crear PDF con información básica
-                try:
-                    from reportlab.lib.pagesizes import letter
-                    from reportlab.pdfgen import canvas
-                except ImportError:
-                    showinfo(
-                        title="Error",
-                        message="No se puede generar PDF. Instale reportlab: pip install reportlab"
-                    )
-                    return
-                
-                pdf_path = os.path.join(reportes_dir, f"Reporte{self.reportID}.pdf")
-                c = canvas.Canvas(pdf_path, pagesize=letter)
-                width, height = letter
-                
-                # Agregar información al PDF
-                c.setFont("Helvetica-Bold", 16)
-                c.drawString(50, height - 50, "Reporte de Diagnóstico de Neumonía")
-                
-                c.setFont("Helvetica", 12)
-                y = height - 100
-                c.drawString(50, y, f"Cédula Paciente: {self.text1.get() or 'N/A'}")
-                y -= 30
-                c.drawString(50, y, f"Resultado: {self.label}")
-                y -= 30
-                c.drawString(50, y, f"Probabilidad: {self.proba:.2f}%")
-                
-                # Guardar imagen del heatmap si está disponible
-                if self.heatmap is not None:
-                    try:
-                        heatmap_img = Image.fromarray(self.heatmap)
-                        temp_path = "temp_heatmap.png"
-                        heatmap_img.save(temp_path)
-                        c.drawImage(temp_path, 50, y - 200, width=300, height=300)
-                        # Limpiar archivo temporal
-                        import os
-                        if os.path.exists(temp_path):
-                            os.remove(temp_path)
-                    except Exception as e:
-                        c.drawString(50, y - 50, f"Nota: No se pudo incluir imagen del heatmap: {str(e)}")
-                
-                c.save()
-                self.reportID += 1
-                showinfo(title="PDF", message=f"El PDF fue generado con éxito: {pdf_path}")
+                showinfo(title="Error", message=f"Error al generar PDF:\n{result}")
                 
         except Exception as e:
             showinfo(
