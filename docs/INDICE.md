@@ -30,6 +30,9 @@
 ### Control de Versiones
 - **[BRANCHING_STRATEGY.md](BRANCHING_STRATEGY.md)** - Estrategia de ramas Git y flujo de trabajo del equipo
 
+### Gestión de Equipos
+- **[ROLES.md](ROLES.md)** - Roles y responsabilidades del equipo de desarrollo
+
 ---
 
 ## 📋 Resumen de Documentos
@@ -43,6 +46,7 @@
 | `DEPENDENCIAS.md` | Gestión de dependencias | Desarrolladores |
 | `TESTS.md` | Estructura de pruebas | Desarrolladores |
 | `BRANCHING_STRATEGY.md` | Flujo de trabajo Git | Equipo de desarrollo |
+| `ROLES.md` | Roles y responsabilidades del equipo | Equipo completo |
 
 ---
 
