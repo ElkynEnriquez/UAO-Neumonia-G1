@@ -14,7 +14,7 @@ El proyecto está organizado siguiendo el patrón **Modelo-Vista-Controlador (MV
 ## 🏗️ Estructura del Proyecto
 
 ```
-UAO-Neumonia-G2/
+UAO-Neumonia-G1/
 │
 ├── 📂 src/                          # Código fuente
 │   │
@@ -35,6 +35,7 @@ UAO-Neumonia-G2/
 │       ├── read_img.py             # Lectura de imágenes (DICOM/JPG/PNG)
 │       ├── preprocess_img.py        # Preprocesamiento de imágenes
 │       └── grad_cam.py              # Generación de mapas de calor Grad-CAM
+│       └── report_generator.py      # Genera reportes y guardar resultados reutilizable GUI y CLI
 │
 ├── 📂 data/                         # Datos del proyecto
 │   ├── models/
@@ -50,9 +51,24 @@ UAO-Neumonia-G2/
 ├── 📂 docs/                         # Documentación del proyecto
 │
 ├── 📄 main.py                       # Punto de entrada principal
+├── 📄 cli.py                       # Interfaz de comandos sin GUI, para Docker
 ├── 📄 requirements.txt              # Dependencias del proyecto
 ├── 📄 pyproject.toml                # Configuración del proyecto
 └── 📄 README.md                     # Documentación principal
+```
+
+---
+
+## 📊 Arquitectura Final
+
+```
+CLI (cli.py) ─────────┐
+                      ├─→ read_image()
+                      ├─→ predict() ────┐
+GUI (main.py) ────────┤                 ├─→ report_generator
+                      │                 │   • save_results_csv()
+                      ├─→ read_image()   └─→ • generate_pdf_report()
+                      └─→ predict() ────┘    • format_prediction_output()
 ```
 
 ---
@@ -159,6 +175,14 @@ label, proba, heatmap = predict(image_array)
   - Configuración de transparencia
   - Compatible con TensorFlow eager execution
 
+### `src/services/report_generator.py`
+Módulo compartido para generar reportes y guardar resultados. Reutilizable desde GUI y CLI.
+
+**Funciones:**
+- `save_results_csv()` - Guarda predicción en CSV con formato estandarizado
+- `generate_pdf_report()` - Genera PDF con información del paciente, diagnóstico y heatmap
+- `format_prediction_output()` - Formatea resultados para consola
+
 ---
 
 ## 🔄 Flujo de Datos
@@ -169,10 +193,12 @@ label, proba, heatmap = predict(image_array)
 └──────┬──────┘
        │
        ▼
-┌─────────────────────┐
-│  detector_neumonia  │ (Vista)
-│  (GUI - Tkinter)    │
-└──────┬──────────────┘
+┌──────────────────────────────────────┐
+│    INTERFAZ (Views)                  │
+├───────────────┬──────────────────────┤
+│ GUI - Tkinter │   CLI                │
+│  (main.py)    │ (cli.py)             │
+└───────────────┴──────────────────────┘
        │
        │ 1. Carga imagen
        ▼
@@ -281,4 +307,4 @@ from src.controllers.integrator import predict
 
 ---
 
-**Última actualización:** 31 de enero de 2026
+**Última actualización:** 03 de febrero de 2026
