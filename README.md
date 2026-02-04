@@ -14,43 +14,62 @@ Aplicación de una técnica de explicación llamada **Grad-CAM** para resaltar c
 
 ### Requisitos Previos
 
+Para ejecutarlo en local:
 - **Python 3.8 o superior** (probado con Python 3.13.2)
 - **TensorFlow 2.10+**
 
+Para ejecutarlo en Docker
+- **Docker** instalado ([Descargar](https://www.docker.com/products/docker-desktop))
+- **Docker Compose** instalado ([Descargar](https://docs.docker.com/compose/install/))
+
 ### Instalación
 
-#### Opción 1: Usando `uv` (Recomendado)
+### Opción 1: Usando `uv` Local (sin Docker)
 
 ```bash
 # Instalar dependencias
 uv pip install -r requirements.txt
-
-# Ejecutar la aplicación
-uv run main.py
+# Desde la raíz del proyecto
+uv run main.py 
 ```
 
-#### Opción 2: Usando `pip` tradicional
+### Opción 2: Usando Python tradicional
 
 ```bash
-# Instalar dependencias
+# 1. Instalar dependencias
 pip install -r requirements.txt
 
-# Ejecutar la aplicación
+# 2. Ejecutar la aplicación
 python main.py
 ```
 
-#### Opción 3: Usando Anaconda
-
+### Opción 3: desde consola CLI
 ```bash
-# Crear entorno conda
-conda create -n tf tensorflow python=3.10
-conda activate tf
+# Con resultados a consola
+python cli.py --input data/DICOM/viral\(2\).dcm --patient-id 12345
 
-# Instalar dependencias
-pip install -r requirements.txt
+# Guardar en CSV y PDF
+python cli.py --input data/DICOM/viral\(2\).dcm --patient-id 12345 --save-csv --save-pdf
 
-# Ejecutar la aplicación
-python main.py
+```
+
+### Opción 4: Docker Compose
+```bash
+# Ejecutar predicción
+docker-compose run neumonia --input /data/DICOM/viral-2.dcm --patient-id 12345 --save-csv --save-pdf
+
+# Construir y ejecutar
+docker-compose up --build
+```
+
+### Opción 5: Docker Directo
+```bash
+# Construir imagen
+docker build -t neumonia-detector .
+
+# Ejecutar
+docker run -v $(pwd)/data:/data -v $(pwd)/report:/app/report ^
+  neumonia-detector --input /data/DICOM/viral(2).dcm --patient-id 12345 --save-csv --save-pdf
 ```
 
 ---
@@ -72,7 +91,7 @@ python main.py
 ## 📁 Estructura del Proyecto
 
 ```
-UAO-Neumonia-G2/
+UAO-Neumonia-G1/
 ├── src/                          # Código fuente (Arquitectura MVC)
 │   ├── models/                   # MODELO - Lógica de ML
 │   │   └── load_model.py         # Carga del modelo CNN
@@ -84,6 +103,7 @@ UAO-Neumonia-G2/
 │       ├── read_img.py           # Lectura de imágenes (DICOM/JPG)
 │       ├── preprocess_img.py     # Preprocesamiento de imágenes
 │       └── grad_cam.py           # Generación de mapas de calor
+│       └── report_generator.py   # Genera reportes y guardar resultados reutilizable GUI y CLI
 ├── data/                         # Datos del proyecto
 │   ├── models/
 │   │   └── conv_MLP_84.h5        # Modelo pre-entrenado
@@ -94,6 +114,7 @@ UAO-Neumonia-G2/
 │       └── virus/
 ├── report/                       # Reportes PDF generados
 ├── main.py                       # Punto de entrada principal
+├── cli.py                        # Interfaz de comandos sin GUI, para Docker
 ├── requirements.txt              # Dependencias del proyecto
 └── pyproject.toml                # Configuración del proyecto
 ```
@@ -122,6 +143,7 @@ El proyecto está organizado siguiendo el patrón **Modelo-Vista-Controlador (MV
   - Normalización de la imagen entre 0 y 1
   - Conversión del arreglo de imagen a formato de batch (tensor)
 - **`grad_cam.py`**: Recibe la imagen y la procesa, carga el modelo, obtiene la predicción y la capa convolucional de interés para obtener las características relevantes de la imagen.
+- **`report_generator.py`**:Módulo compartido para generar reportes y guardar resultados. Reutilizable desde GUI y CLI.
 
 ---
 
@@ -167,6 +189,7 @@ Grad-CAM realiza el cálculo del gradiente de la salida correspondiente a la cla
 - **PyDICOM**: Lectura de archivos DICOM
 - **ReportLab**: Generación de PDFs
 - **NumPy**: Operaciones numéricas
+- **Docker**: Contenedor de la aplicación
 
 ---
 
@@ -194,4 +217,4 @@ Este proyecto es parte del trabajo académico de la Universidad Autónoma de Occ
 ---
 
 **Versión:** 0.1.0  
-**Última actualización:** 02 febrero 2026
+**Última actualización:** 03 febrero 2026
