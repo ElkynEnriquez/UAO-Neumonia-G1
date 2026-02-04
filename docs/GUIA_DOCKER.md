@@ -25,7 +25,7 @@ docker-compose run neumonia --input /data/DICOM/viral-2.dcm --patient-id 12345 -
 # Solo predicción (sin guardar)
 docker-compose run neumonia --input /data/JPG/virus/1.jpg
 
-# Con modo verbose
+# Con pdf
 docker-compose run neumonia --input /data/DICOM/normal(2).dcm -p ABC123 --save-pdf
 
 # Procesar batch de imágenes
