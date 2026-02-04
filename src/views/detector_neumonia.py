@@ -1,21 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
+"""-->main
 Interfaz gráfica para la detección rápida de neumonía.
 Utiliza los módulos modulares del proyecto para realizar predicciones.
 """
 
-import os
-from tkinter import Tk, StringVar, Text, END
-from tkinter import ttk, font, filedialog
-from tkinter.messagebox import askokcancel, showinfo, WARNING
-from PIL import ImageTk, Image
+from tkinter import END, StringVar, Text, Tk, filedialog, font, ttk
+from tkinter.messagebox import WARNING, askokcancel, showinfo
 
+from PIL import Image, ImageTk
+
+from src.controllers.integrator import predict
 # Importar módulos del proyecto
 from src.services.read_img import read_image
-from src.controllers.integrator import predict
-from src.services.report_generator import save_results_csv, generate_pdf_report
+from src.services.report_generator import generate_pdf_report, save_results_csv
+
+# try:
+#     from reportlab.lib.pagesizes import letter
+#     from reportlab.pdfgen import canvas
+# except ImportError:
+#     showinfo(
+#         title="Error",
+#         message="No se puede generar PDF. Instale reportlab: pip install reportlab"
+#     )
+
+
+# Compatibilidad para el filtro de remuestreo LANCZOS en distintas versiones de Pillow
+try:
+    RESAMPLE_LANCZOS = Image.Resampling.LANCZOS
+except Exception:
+    RESAMPLE_LANCZOS = getattr(Image, 'LANCZOS', 1)
 
 
 class App:
@@ -273,9 +288,11 @@ class App:
                 probability=self.proba,
                 filepath="historial.csv"
             ):
-                showinfo(title="Guardar", message="Los datos se guardaron con éxito.")
+                showinfo(title="Guardar",
+                         message="Los datos se guardaron con éxito.")
             else:
-                showinfo(title="Error", message="No se pudieron guardar los datos.")
+                showinfo(title="Error",
+                         message="No se pudieron guardar los datos.")
         except Exception as e:
             showinfo(
                 title="Error",
@@ -299,15 +316,17 @@ class App:
                 probability=self.proba,
                 heatmap_array=self.heatmap,
                 output_dir="report",
-                report_id=self.reportID
+                report_id=self.report_id
             )
-            
+
             if success:
-                self.reportID += 1
-                showinfo(title="PDF", message=f"El PDF fue generado con éxito:\n{result}")
+                self.report_id += 1
+                showinfo(
+                    title="PDF", message=f"El PDF fue generado con éxito:\n{result}")
             else:
-                showinfo(title="Error", message=f"Error al generar PDF:\n{result}")
-                
+                showinfo(title="Error",
+                         message=f"Error al generar PDF:\n{result}")
+
         except Exception as e:
             showinfo(
                 title="Error",
