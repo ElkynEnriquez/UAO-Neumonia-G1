@@ -73,4 +73,4 @@
 
 ---
 
-**Mantenido por:** Equipo de Desarrollo UAO-Neumonia-G2
+**Mantenido por:** Equipo de Desarrollo UAO-Neumonia-G1

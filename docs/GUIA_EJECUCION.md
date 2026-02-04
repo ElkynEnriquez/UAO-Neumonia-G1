@@ -1,6 +1,6 @@
 # Guía de Ejecución del Proyecto - Paso a Paso
 
-**Proyecto:** UAO-Neumonia-G2  
+**Proyecto:** UAO-Neumonia-G1
 **Tipo:** Aplicación de escritorio con interfaz gráfica (GUI)
 
 ---
@@ -17,7 +17,7 @@ Es una **aplicación de escritorio** con interfaz gráfica que permite:
 
 ## 🚀 Cómo Ejecutar el Proyecto
 
-### Opción 1: Usando `uv` (Recomendado)
+### Opción 1: Usando `uv` Local (sin Docker)
 
 ```bash
 # Desde la raíz del proyecto
@@ -34,10 +34,33 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### Opción 3: Ejecutar directamente el módulo de vista
-
+### Opción 3: desde consola CLI
 ```bash
-python -m src.views.detector_neumonia
+# Con resultados a consola
+python cli.py --input data/DICOM/viral\(2\).dcm --patient-id 12345
+
+# Guardar en CSV y PDF
+python cli.py --input data/DICOM/viral\(2\).dcm --patient-id 12345 --save-csv --save-pdf
+
+```
+
+### Opción 4: Docker Compose
+```bash
+# Ejecutar predicción
+docker-compose run neumonia --input /data/DICOM/viral-2.dcm --patient-id 12345 --save-csv --save-pdf
+
+# Construir y ejecutar
+docker-compose up --build
+```
+
+### Opción 5: Docker Directo
+```bash
+# Construir imagen
+docker build -t neumonia-detector .
+
+# Ejecutar
+docker run -v $(pwd)/data:/data -v $(pwd)/report:/app/report ^
+  neumonia-detector --input /data/DICOM/viral(2).dcm --patient-id 12345 --save-csv --save-pdf
 ```
 
 ---
@@ -128,30 +151,6 @@ python main.py
 ```bash
 pip install -r requirements.txt
 ```
-
----
-
-## 📁 Estructura del Proyecto (Para Referencia)
-
-```
-UAO-Neumonia-G2/
-├── main.py                    # ← Punto de entrada (EJECUTAR ESTE)
-├── src/
-│   ├── views/
-│   │   └── detector_neumonia.py  # ← Interfaz gráfica (GUI)
-│   ├── controllers/
-│   │   └── integrator.py         # ← Lógica de predicción
-│   ├── services/                  # ← Procesamiento de imágenes
-│   └── models/                   # ← Carga del modelo ML
-├── data/
-│   ├── models/
-│   │   └── conv_MLP_84.h5        # ← Modelo pre-entrenado
-│   ├── DICOM/                    # ← Imágenes de prueba DICOM
-│   └── JPG/                      # ← Imágenes de prueba JPG
-└── requirements.txt              # ← Dependencias
-```
-
----
 
 ## ✅ Checklist de Ejecución
 
