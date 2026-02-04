@@ -10,7 +10,7 @@ pydicom>=2.3.0
 # GUI and utilities
 tkcap>=0.0.1
 img2pdf>=0.4.0
-reportlab>=3.6.0  # Alternativa para generar PDFs sin tkcap
+reportlab>=4.0.0  # Alternativa para generar PDFs sin tkcap
 
 # Optional: python-xlib (solo para Linux, descomentar si es necesario)
 # python-xlib>=0.33; sys_platform == "linux"
