@@ -2,11 +2,12 @@
 
 ## Resumen
 
-Se implementaron **33 pruebas unitarias** que cubren los módulos principales del proyecto:
+Se implementaron **38 pruebas unitarias** que cubren los módulos principales del proyecto:
 - Lectura de imágenes (DICOM, JPG, PNG)
 - Preprocesamiento de imágenes (resize, CLAHE, normalización)
 - Carga del modelo de deep learning
 - Generación de mapas de calor Grad-CAM
+- Generación de reportes (CSV, PDF)
 - Pipeline completo de predicción
 
 ## Estructura del Directorio de Tests
@@ -18,7 +19,8 @@ test/
 │   ├── __init__.py
 │   ├── test_read_img.py          # 8 tests - Lectura de imágenes
 │   ├── test_preprocess_img.py    # 6 tests - Preprocesamiento
-│   └── test_grad_cam.py          # 7 tests - Generación de heatmaps
+│   ├── test_grad_cam.py          # 7 tests - Generación de heatmaps
+│   └── test_report_generator.py  # 5 tests - Generación de reportes
 ├── test_models/
 │   ├── __init__.py
 │   └── test_load_model.py        # 5 tests - Carga del modelo CNN
@@ -266,6 +268,26 @@ uv run pytest test/test_services/test_grad_cam.py -v
 ```
 
 **Estrategia:** Usa fixture `modelo_cargado` que carga el modelo una sola vez para todos los tests.
+
+---
+
+### test_report_generator.py (5 tests)
+
+**Propósito:** Verificar generación correcta de reportes en CSV y PDF.
+
+**Tests incluidos:**
+1. `test_save_results_csv_new_file` - Guarda resultados en CSV nuevo con encabezados
+2. `test_save_results_csv_existing_file` - Guarda resultados en CSV existente sin encabezados
+3. `test_generate_pdf_report_success` - Genera PDF exitosamente
+4. `test_generate_pdf_report_with_heatmap` - Genera PDF con heatmap Grad-CAM incluido
+5. `test_format_prediction_output` - Formatea salida para consola correctamente
+
+**Ejecutar:**
+```bash
+uv run pytest test/test_services/test_report_generator.py -v
+```
+
+**Estrategia:** Usa mocks para `csv.writer`, `canvas.Canvas`, `datetime` y operaciones de archivos para evitar crear archivos reales durante los tests. Simula la fecha/hora para verificaciones precisas.
 
 ---
 
