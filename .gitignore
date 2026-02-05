@@ -154,3 +154,5 @@ Thumbs.db
 tmp/
 temp/
 .idea/
+.vscode/
+.vscode/**
